@@ -84,6 +84,8 @@ if first_choice is "1":
 |/#############!!!\#########%%%!!!!!!|\\n''')
         print("\nyou ran through the woods pass a hill and you see a magnificent castle beneath you")
     # print("please choose 1 or 2 adventurer")
+    else:
+      print("please choose 1 or 2 adventurer")
 
 
 
@@ -114,7 +116,65 @@ elif first_choice is "2":
 |IIIIilIIIIITTTTTTTIIIIIIIIIIIIITTTTTIIIIIIIIITTTTTTTTTTIIIIIIIIIlIIIIIIIITTTT|
 |IIIIIIIIITTTTTTTTTTTTTIIIIIIIITTTTTTTTIIIIIITTTTTTTTTTTTTTIIIIIIIIIIIIIITTTTT|''')
     print("\nThe mines seems desert at first sight but you can see a comfy fire far away")
+
+    
+
+    print("What do you do?\n")
+    print("1. You run toward the fire, and the more you approaches the more the atmosphere is strange.")
+    print("2. You take your sword and walk carefully in a corridor.\n")
+
+    third_choice=input("choose:")
+    if third_choice is "1":
+      print('''
+|                  '                                      |
+|                  )                    `                 |
+|                 /(l                   /)                |
+|                (  \                  / (                |
+|                ) * )                ( , )               |
+|                 \#/                  \#'                |
+|               .-"#'-.             .-"#"=,               |
+|            (  |"-.='|            '|"-,-"|               |
+|            )\ |     |  ,        /(|     | /(         ,  |
+|   (       /  )|     | (\       (  \     | ) )       ((. |
+|   )\     (   (|     | ) )      ) , )    |/ (        ) \ |
+|  /  )     ) . )     |/  (     ( # (     ( , )      /   )|
+| ( * (      \#/|     (`# )      `#/|     |`#/      (  '( |
+|  \#/     .-"#'-.   .-"#'-,   .-"#'-.   .-=#"-;     `#/. |
+|.-"#'-.   |"=,-"|   |"-.-"|)  1"-.-"|   |"-.-"|   ,-"#"-.|
+||"-.-"|   |  !  |   |     |   |     |   |     !   |"-.-"||
+||     |   |     |._,|     |   |     |._,|     a   |     ||
+||     |   |     |   |     |   |     |   |     p   |     ||
+||     |   |     |   |     |   |     |   |     x   |     ||
+|'-._,-'   '-._,-'   '-._,-'   '-._,-'   '-._,-"   '-._,-'|
+      \n''')
+      print("Finally, you met a group of happy dwarves smoking a lot debatting on how to get more gold out of the mountains. You share a beer with them and they invited you to the city underneath a kilometer away.")
+
+    if third_choice is "2":
+      print ('''
+_____________________________________________
+|.'',                                     ,''.|
+|.'.'',                                 ,''.'.|
+|.'.'.'',                             ,''.'.'.|
+|.'.'.'.'',                         ,''.'.'.'.|
+|.'.'.'.'.|                         |.'.'.'.'.|
+|.'.'.'.'.|===;                 ;===|.'.'.'.'.|
+|.'.'.'.'.|:::|',             ,'|:::|.'.'.'.'.|
+|.'.'.'.'.|---|'.|, _______ ,|.'|---|.'.'.'.'.|
+|.'.'.'.'.|:::|'.|'|???????|'|.'|:::|.'.'.'.'.|
+|,',',',',|---|',|'|???????|'|,'|---|,',',',',|
+|.'.'.'.'.|:::|'.|'|???????|'|.'|:::|.'.'.'.'.|
+|.'.'.'.'.|---|','   /%%%\   ','|---|.'.'.'.'.|
+|.'.'.'.'.|===:'    /%%%%%\    ':===|.'.'.'.'.|
+|.'.'.'.'.|%%%%%%%%%%%%%%%%%%%%%%%%%|.'.'.'.'.|
+|.'.'.'.','       /%%%%%%%%%\       ','.'.'.'.|
+|.'.'.','        /%%%%%%%%%%%\        ','.'.'.|
+|.'.','         /%%%%%%%%%%%%%\         ','.'.|
+|.','          /%%%%%%%%%%%%%%%\          ','.|
+|;____________/%%%%%Spicer%%%%%%\____________;|
+      \n''')
+      print ('Soon the corridor is showing you a lot of choices good... and probably bad.')
+
 else:
     print("please choose 1 or 2 adventurer")
 
-cprint(figlet_format("The end", font ="slant"), "blue", attrs=["bold"])
+cprint(figlet_format("To be continued...", font ="slant"), "blue", attrs=["bold"])
