@@ -3,7 +3,7 @@ from pyfiglet import figlet_format, Figlet
 
 # f = Figlet(font="slant")
 # print(f.renderText("Kevin Medieval Adventure's"))
-cprint(figlet_format("Medieval Adventure's", font ="slant"), "red", attrs=["bold"])
+cprint(figlet_format("Medieval Adventures", font ="slant"), "red", attrs=["bold"])
 
 print ("""           
 |          .-----.     |
