@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medieval Adventures ⚔️</title>
+  <link rel="stylesheet" href="https://unpkg.com/@xterm/xterm@5.5.0/css/xterm.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #ccc;
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 12px;
+    }
+
+    h1 {
+      color: #8b0000;
+      font-size: 1.1rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.7;
+    }
+
+    #terminal-wrapper {
+      width: min(900px, 100%);
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      overflow: hidden;
+      display: none;
+    }
+
+    #terminal-titlebar {
+      background: #1e1e1e;
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      color: #555;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red    { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green  { background: #28c840; }
+
+    #terminal { padding: 10px; }
+
+    #loading {
+      width: min(900px, 100%);
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    #loading-title {
+      color: #8b0000;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      letter-spacing: 0.1em;
+    }
+
+    #loading-bar-wrapper {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      height: 6px;
+      width: 300px;
+      margin: 0 auto 16px;
+      overflow: hidden;
+    }
+
+    #loading-bar {
+      height: 100%;
+      background: #8b0000;
+      width: 0%;
+      transition: width 0.4s ease;
+      border-radius: 4px;
+    }
+
+    #loading-status {
+      color: #555;
+      font-size: 0.8rem;
+    }
+
+    #error {
+      color: #cc3333;
+      padding: 20px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚔ Medieval Adventures ⚔</h1>
+
+  <div id="loading">
+    <div id="loading-title">Loading game...</div>
+    <div id="loading-bar-wrapper"><div id="loading-bar"></div></div>
+    <div id="loading-status">Starting Python runtime…</div>
+  </div>
+
+  <div id="terminal-wrapper">
+    <div id="terminal-titlebar">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span style="margin-left:8px">medAdv — python terminal</span>
+    </div>
+    <div id="terminal"></div>
+  </div>
+
+  <div id="error"></div>
+
+  <script src="https://unpkg.com/@xterm/xterm@5.5.0/lib/xterm.js"></script>
+  <script src="https://unpkg.com/@xterm/addon-fit@0.10.0/lib/addon-fit.js"></script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+  <script>
+    function setProgress(pct, label) {
+      document.getElementById('loading-bar').style.width = pct + '%';
+      document.getElementById('loading-status').textContent = label;
+    }
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      const el = document.getElementById('error');
+      el.textContent = '⚠ ' + msg;
+      el.style.display = 'block';
+    }
+
+    async function main() {
+      // ── Terminal setup ───────────────────────────────────────────────────────
+      const term = new Terminal({
+        theme: {
+          background:  '#111111',
+          foreground:  '#cccccc',
+          cursor:      '#cc3333',
+          selectionBackground: '#333',
+        },
+        fontFamily: '"Courier New", Courier, monospace',
+        fontSize: 13,
+        lineHeight: 1.25,
+        cursorBlink: true,
+        convertEol: true,
+        scrollback: 2000,
+      });
+
+      const fitAddon = new FitAddon.FitAddon();
+      term.loadAddon(fitAddon);
+
+      // ── Input bridge ─────────────────────────────────────────────────────────
+      let inputResolve  = null;
+      let inputBuffer   = '';
+      let waitingInput  = false;
+
+      term.onKey(({ key, domEvent }) => {
+        if (!waitingInput) return;
+        const k = domEvent.key;
+        if (k === 'Enter') {
+          term.write('\r\n');
+          const val = inputBuffer;
+          inputBuffer  = '';
+          waitingInput = false;
+          if (inputResolve) { inputResolve(val); inputResolve = null; }
+        } else if (k === 'Backspace') {
+          if (inputBuffer.length > 0) {
+            inputBuffer = inputBuffer.slice(0, -1);
+            term.write('\b \b');
+          }
+        } else if (key.length === 1) {
+          inputBuffer += key;
+          term.write(key);
+        }
+      });
+
+      // Exposed to Python
+      function jsInput(prompt) {
+        return new Promise(resolve => {
+          if (prompt) term.write(prompt);
+          waitingInput  = true;
+          inputResolve  = resolve;
+          term.focus();
+        });
+      }
+
+      function jsPrint(text) {
+        term.write(text);
+      }
+
+      // ── Load Pyodide ─────────────────────────────────────────────────────────
+      setProgress(10, 'Loading Python (Pyodide)…');
+      const pyodide = await loadPyodide({
+        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'
+      });
+
+      // ── Install pyfiglet ─────────────────────────────────────────────────────
+      setProgress(55, 'Installing pyfiglet…');
+      await pyodide.loadPackage('micropip');
+      await pyodide.runPythonAsync(`
+import micropip
+await micropip.install('pyfiglet')
+`);
+
+      // ── Load game code ───────────────────────────────────────────────────────
+      setProgress(80, 'Loading game…');
+      const gameResp = await fetch('./game.py');
+      if (!gameResp.ok) throw new Error('Cannot load game.py (' + gameResp.status + ')');
+      const gameCode = await gameResp.text();
+
+      // ── Show terminal ────────────────────────────────────────────────────────
+      setProgress(100, 'Ready!');
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('terminal-wrapper').style.display = 'block';
+
+      term.open(document.getElementById('terminal'));
+      fitAddon.fit();
+      term.focus();
+
+      window.addEventListener('resize', () => fitAddon.fit());
+
+      // ── Python bridges ───────────────────────────────────────────────────────
+      pyodide.globals.set('_js_input', jsInput);
+      pyodide.globals.set('_js_print', jsPrint);
+
+      await pyodide.runPythonAsync(`
+import builtins, sys
+from js import _js_print, _js_input
+
+def _print(*args, sep=' ', end='\\n', file=None, flush=False):
+    _js_print(sep.join(str(a) for a in args) + end)
+
+async def _input(prompt=''):
+    return await _js_input(prompt)
+
+builtins.print = _print
+builtins.input = _input
+sys.stdout.write = lambda s: _js_print(s)
+sys.stderr.write  = lambda s: _js_print(s)
+`);
+
+      // ── Run the game ─────────────────────────────────────────────────────────
+      await pyodide.runPythonAsync(gameCode);
+
+      term.write('\r\n\033[90m── Game over. Refresh the page to play again. ──\033[0m\r\n');
+    }
+
+    main().catch(err => {
+      console.error(err);
+      showError(err.message || String(err));
+    });
+  </script>
+</body>
+</html>
