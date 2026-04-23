@@ -229,8 +229,8 @@ await micropip.install('pyfiglet')
       window.addEventListener('resize', () => fitAddon.fit());
 
       // ── Python bridges ───────────────────────────────────────────────────────
-      pyodide.globals.set('_js_input', jsInput);
-      pyodide.globals.set('_js_print', jsPrint);
+      globalThis._js_input = jsInput;
+      globalThis._js_print = jsPrint;
 
       await pyodide.runPythonAsync(`
 import builtins, sys
