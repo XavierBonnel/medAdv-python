@@ -19,28 +19,12 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 12px;
-    }
-
-    h1 {
-      color: #8b0000;
-      font-size: 1.1rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      opacity: 0.7;
-      flex-shrink: 0;
     }
 
     #terminal-wrapper {
       width: 100%;
-      flex: 1;
-      min-height: 0;
+      height: 100%;
       background: #111;
-      border: 1px solid #2a2a2a;
-      border-radius: 6px;
       overflow: hidden;
       display: none;
       flex-direction: column;
@@ -113,8 +97,6 @@
   </style>
 </head>
 <body>
-  <h1>⚔ Medieval Adventures ⚔</h1>
-
   <div id="loading">
     <div id="loading-title">Loading game...</div>
     <div id="loading-bar-wrapper"><div id="loading-bar"></div></div>
